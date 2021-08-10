@@ -8,7 +8,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const markdownToVue = createMarkdown(options)
 
   return {
-    name: 'vite-plugin-md',
+    name: 'vite-rvplugin-md',
     enforce: 'pre',
     transform(raw, id) {
       if (id.endsWith('.md')) {

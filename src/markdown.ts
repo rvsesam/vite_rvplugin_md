@@ -70,10 +70,13 @@ export function createMarkdown(options: ResolvedOptions) {
     html = customBlocks.html
 
     const scriptLines: string[] = []
+    let myLayout = 'defaultMD'
+    scriptLines.push('import { defineComponent } from "vue";')
 
     if (options.frontmatter) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
+      frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'defaultMD'
       if (headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')
@@ -81,10 +84,21 @@ export function createMarkdown(options: ResolvedOptions) {
       }
     }
 
+    scriptLines.unshift(`import ${myLayout} from "../layouts/${myLayout}.vue";`)
     scriptLines.push(...hoistScripts.scripts)
-
-    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n${customBlocks.blocks.join('\n')}\n`
-
+    scriptLines.push(`export default defineComponent({components: { ${myLayout} },});`)
+    const sfc = `<template><${myLayout}>${html}</${myLayout}></template>
+      <script lang="js">
+      ${scriptLines.join('\n')}
+      </script>
+      ${customBlocks.blocks.join('\n')}
+      <style>
+      .prose-sm h1,.prose-sm h2,.prose-sm h3 { color: var(--app-h-color);}
+      .prose-sm code { color: var(--app-code-text); background: var(--app-code-bg); }
+      .prose code::before {content:'beef';}
+      .prose code::after {content:'aaaf';}
+      </style>
+      `
     return sfc
   }
 }
