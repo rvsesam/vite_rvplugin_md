@@ -70,13 +70,13 @@ export function createMarkdown(options: ResolvedOptions) {
     html = customBlocks.html
 
     const scriptLines: string[] = []
-    let myLayout = 'defaultMD'
+    let myLayout = 'default2'
     scriptLines.push('import { defineComponent } from "vue";')
 
     if (options.frontmatter) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
-      frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'defaultMD'
+      frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'default2'
       if (headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')
