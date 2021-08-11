@@ -44,7 +44,7 @@ export function createMarkdown(options: ResolvedOptions) {
   options.markdownItSetup(markdown)
 
   return (id: string, raw: string) => {
-    const { wrapperClasses, wrapperComponent, transforms, headEnabled, frontmatterPreprocess } = options
+    const { wrapperClasses, wrapperComponent, transforms, frontmatterPreprocess } = options
 
     if (transforms.before)
       raw = transforms.before(raw, id)
