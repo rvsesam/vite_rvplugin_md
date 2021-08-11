@@ -74,14 +74,17 @@ export function createMarkdown(options: ResolvedOptions) {
     scriptLines.push('import { defineComponent } from "vue";')
 
     if (options.frontmatter) {
-      const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
+      // const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
+      const { frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
       frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'default2'
+      /*
       if (headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')
         scriptLines.push('useHead(head)')
       }
+      */
     }
 
     scriptLines.unshift(`import ${myLayout} from "../layouts/${myLayout}.vue";`)
