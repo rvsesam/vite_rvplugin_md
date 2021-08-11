@@ -95,12 +95,6 @@ export function createMarkdown(options: ResolvedOptions) {
       ${scriptLines.join('\n')}
       </script>
       ${customBlocks.blocks.join('\n')}
-      <style>
-      .prose-sm h1,.prose-sm h2,.prose-sm h3 { color: var(--app-h-color);}
-      .prose-sm code { color: var(--app-code-text); background: var(--app-code-bg); }
-      .prose code::before {content:'beef';}
-      .prose code::after {content:'aaaf';}
-      </style>
       `
     return sfc
   }
