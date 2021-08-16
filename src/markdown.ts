@@ -42,12 +42,19 @@ export function createMarkdown(options: ResolvedOptions) {
   })
 
   options.markdownItSetup(markdown)
-  return (id, raw) => {
+
+  return (id: string, raw: string) => {
     const { wrapperClasses, wrapperComponent, transforms, frontmatterPreprocess } = options
+
     if (transforms.before)
       raw = transforms.before(raw, id)
-    const { content: md, data } = options.frontmatter ? _graymatter2.default.call(void 0, raw) : { content: raw, data: null }
+
+    const { content: md, data } = options.frontmatter
+      ? matter(raw)
+      : { content: raw, data: null }
+
     let html = markdown.render(md, {})
+
     if (wrapperClasses)
       html = `<div class="${wrapperClasses}">${html}</div>`
     else
@@ -56,27 +63,39 @@ export function createMarkdown(options: ResolvedOptions) {
       html = `<${wrapperComponent}${options.frontmatter ? ' :frontmatter="frontmatter"' : ''}>${html}</${wrapperComponent}>`
     if (transforms.after)
       html = transforms.after(html, id)
+
     const hoistScripts = extractScriptSetup(html)
     html = hoistScripts.html
     const customBlocks = extractCustomBlock(html, options)
     html = customBlocks.html
-    const scriptLines = []
+
+    const scriptLines: string[] = []
     let myLayout = 'default2'; let path = '../'
     scriptLines.push('import { defineComponent } from "vue";')
+
     if (options.frontmatter) {
+      // const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       const { frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
+      frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'default2'
       if (frontmatter.level === 3) path = '../../../'
       if (frontmatter.level === 2) path = '../../'
-      frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'default2'
+      /*
+        if (headEnabled && head) {
+          scriptLines.push(`const head = ${JSON.stringify(head)}`)
+          scriptLines.unshift('import { useHead } from "@vueuse/head"')
+          scriptLines.push('useHead(head)')
+        }
+        */
     }
-    scriptLines.unshift(`import ${myLayout} from "${path}layouts/${myLayout}.vue";`)
+
+    scriptLines.unshift(`import ${myLayout} from "../layouts/${myLayout}.vue";`)
     scriptLines.push(...hoistScripts.scripts)
     scriptLines.push(`export default defineComponent({components: { ${myLayout} },});`)
     const sfc = `<template><${myLayout}>${html}</${myLayout}></template>
       <script lang="js">
       ${scriptLines.join('\n')}
-      <\/script>
+      </script>
       ${customBlocks.blocks.join('\n')}
       `
     return sfc
