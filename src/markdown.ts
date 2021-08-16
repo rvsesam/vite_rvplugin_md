@@ -89,7 +89,7 @@ export function createMarkdown(options: ResolvedOptions) {
         */
     }
 
-    scriptLines.unshift(`import ${myLayout} from "../layouts/${myLayout}.vue";`)
+    scriptLines.unshift(`import ${myLayout} from "${path}/layouts/${myLayout}.vue";`)
     scriptLines.push(...hoistScripts.scripts)
     scriptLines.push(`export default defineComponent({components: { ${myLayout} },});`)
     const sfc = `<template><${myLayout}>${html}</${myLayout}></template>
