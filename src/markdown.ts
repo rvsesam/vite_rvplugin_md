@@ -70,7 +70,8 @@ export function createMarkdown(options: ResolvedOptions) {
     html = customBlocks.html
 
     const scriptLines: string[] = []
-    let myLayout = 'default2'; let path = '../'
+    let myLayout = 'default2'
+    let path = ''
     scriptLines.push('import { defineComponent } from "vue";')
 
     if (options.frontmatter) {
@@ -78,8 +79,11 @@ export function createMarkdown(options: ResolvedOptions) {
       const { frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
       frontmatter.layout ? myLayout = frontmatter.layout : myLayout = 'default2'
-      if (frontmatter.level === 3) path = '../../../'
-      if (frontmatter.level === 2) path = '../../'
+      let i = (frontmatter.path.match(/\//g) || []).length
+      while (i > 0) {
+        path += '../'
+        i--
+      }
       /*
         if (headEnabled && head) {
           scriptLines.push(`const head = ${JSON.stringify(head)}`)
@@ -89,7 +93,7 @@ export function createMarkdown(options: ResolvedOptions) {
         */
     }
 
-    scriptLines.unshift(`import ${myLayout} from "${path}/layouts/${myLayout}.vue";`)
+    scriptLines.unshift(`import ${myLayout} from "${path}layouts/${myLayout}.vue";`)
     scriptLines.push(...hoistScripts.scripts)
     scriptLines.push(`export default defineComponent({components: { ${myLayout} },});`)
     const sfc = `<template><${myLayout}>${html}</${myLayout}></template>
