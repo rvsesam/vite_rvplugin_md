@@ -96,10 +96,15 @@ export function createMarkdown(options: ResolvedOptions) {
     scriptLines.unshift(`import ${myLayout} from "${path}layouts/${myLayout}.vue";`)
     scriptLines.push(...hoistScripts.scripts)
     scriptLines.push(`export default defineComponent({components: { ${myLayout} },});`)
-    const sfc = `<template><${myLayout}>${html}</${myLayout}></template>
+    const sfc = `<template>${html}</template>
       <script lang="js">
       ${scriptLines.join('\n')}
       </script>
+      <style scoped>
+      img {
+        max-width: 800px;
+      }
+      </style>
       ${customBlocks.blocks.join('\n')}
       `
     return sfc
